@@ -1,0 +1,13 @@
+### Directories
+node_modules/
+dist/
+
+### Files
+package-lock.json
+
+### Hidden files
+.editorconfig
+.DS_Store
+src/.DS_Store
+.env
+.DS_Store
