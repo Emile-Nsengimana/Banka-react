@@ -1,8 +1,12 @@
-const webpack = require('webpack');
+const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ErrorOverlayPlugin = require('error-overlay-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    main: ['@babel/polyfill', './src/index.js'],
+  },
   module: {
     rules: [
       {
@@ -18,25 +22,48 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /.(css|scss)$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /.(jpg|jpeg|png|gif|svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[path][name]-[hash:8].[ext]',
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {
     extensions: ['*', '.js', '.jsx'],
   },
   output: {
-    path: `${__dirname}/dist`,
+    path: `${__dirname}/build`,
     publicPath: '/',
     filename: 'bundle.js',
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
     new HtmlWebPackPlugin({
-      template: './public/index.html',
+      template: path.join(__dirname, 'public', 'index.html'),
       filename: './index.html',
     }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[id].css',
+    }),
+    new ErrorOverlayPlugin(),
   ],
   devServer: {
-    contentBase: './dist',
-    hot: true,
+    stats: 'minimal',
+    historyApiFallback: {
+      disableDotRule: true,
+    },
+    port: 8000,
+    contentBase: './build',
   },
 };
